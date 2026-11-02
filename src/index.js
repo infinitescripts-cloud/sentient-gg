@@ -1,3 +1,4 @@
+
 import { transformLuau, validateBasic } from './transform.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
@@ -146,7 +147,7 @@ async function routeAPI(request, env, ctx) {
         const [p,b,l,a,activations] = await Promise.all([
           env.DB.prepare('SELECT COUNT(*) AS n FROM projects').first(),
           env.DB.prepare('SELECT COUNT(*) AS n FROM builds').first(),
-          env.DB.prepare("SELECT COUNT(*) AS n FROM licenses WHERE status=\'active\' AND (expires_at IS NULL OR expires_at>?)").bind(now()).first(),
+          env.DB.prepare("SELECT COUNT(*) AS n FROM licenses WHERE status='active' AND (expires_at IS NULL OR expires_at>?)").bind(now()).first(),
           env.DB.prepare('SELECT COUNT(*) AS n FROM audit WHERE created_at >= ?').bind(new Date(Date.now()-86400000).toISOString()).first(),
           env.DB.prepare('SELECT COUNT(*) AS n FROM license_activations').first()
         ]);
@@ -188,10 +189,12 @@ async function routeAPI(request, env, ctx) {
 
       if (projectMatch && method === 'DELETE') {
         const p = await env.DB.prepare('SELECT * FROM projects WHERE id=?').bind(projectMatch[1]).first();
-        if (!p) return json({ error:'Project not found.' }, 404);
+        if (!p) return json({ error:'Project not found.' },404);
         const { results=[] } = await env.DB.prepare('SELECT output_key FROM builds WHERE project_id=?').bind(p.id).all();
         for (const b of results) if (env.BUILDS) await env.BUILDS.delete(b.output_key);
+        await env.DB.prepare('DELETE FROM builds WHERE project_id=?').bind(p.id).run();
         await env.DB.prepare('DELETE FROM projects WHERE id=?').bind(p.id).run();
+
         await audit(env, request, 'project_deleted', p.name);
         return json({ ok:true });
       }
