@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sentinel-platform",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sentinel-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    { "binding": "BUILDS", "bucket_name": "sentinel-builds" }
+  ],
+  "triggers": { "crons": ["17 * * * *"] },
+  "vars": {
+    "APP_NAME": "Sentinel",
+    "APP_VERSION": "3.0.0",
+    "ADMIN_USERNAME": "admin",
+    "SESSION_TTL_SECONDS": "28800",
+    "MAX_SOURCE_BYTES": "1000000"
+  }
+}
