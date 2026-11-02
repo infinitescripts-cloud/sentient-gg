@@ -1,0 +1,18 @@
+{
+  "name": "sentinel-cloudflare",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sentinel Luau project, build, and license management platform for Cloudflare Workers",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 migrations apply sentinel-db --local",
+    "db:remote": "wrangler d1 migrations apply sentinel-db --remote",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "engines": { "node": ">=20" }
+}
